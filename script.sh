@@ -1,0 +1,46 @@
+python3 train.py \
+    --batchSize 8 \
+    --dataroot /mnt/4T/xujialiu/I2I-Mamba/test_move_shift \
+    --name test_train \
+    --gpu_ids 0 \
+    --model i2i_mamba_one \
+    --which_model_netG i2i_mamba\
+    --which_direction AtoB \
+    --lambda_A 100 \
+    --dataset_mode aligned \
+    --norm batch \
+    --pool_size 0 \
+    --output_nc 1 \
+    --input_nc 1 \
+    --loadSize 256 \
+    --fineSize 256 \
+    --niter 30 \
+    --niter_decay 30 \
+    --save_epoch_freq 5 \
+    --checkpoints_dir checkpoints/ \
+    --display_id 0 \
+    --lr 0.0002
+
+# decrease lr and add epoch
+nohup python3 train.py \
+    --batchSize 28 \
+    --dataroot /mnt/4T/xujialiu/I2I-Mamba/test_move_shift \
+    --name test_train_2 \
+    --gpu_ids 0 \
+    --model i2i_mamba_one \
+    --which_model_netG i2i_mamba\
+    --which_direction AtoB \
+    --lambda_A 100 \
+    --dataset_mode aligned \
+    --norm batch \
+    --pool_size 0 \
+    --output_nc 1 \
+    --input_nc 1 \
+    --loadSize 256 \
+    --fineSize 256 \
+    --niter 200 \
+    --niter_decay 1000 \
+    --save_epoch_freq 5 \
+    --checkpoints_dir checkpoints/ \
+    --display_id 0 \
+    --lr 0.0001 > output_test_train_1.log 2>&1 &

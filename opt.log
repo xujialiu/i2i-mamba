@@ -1,0 +1,107 @@
+usage: train.py [-h] --dataroot DATAROOT [--batchSize BATCHSIZE] [--loadSize LOADSIZE] [--fineSize FINESIZE] [--input_nc INPUT_NC] [--output_nc OUTPUT_NC] [--ngf NGF] [--ndf NDF] [--which_model_netD WHICH_MODEL_NETD]
+                [--which_model_netG WHICH_MODEL_NETG] [--n_layers_D N_LAYERS_D] [--gpu_ids GPU_IDS] [--name NAME] [--dataset_mode DATASET_MODE] [--model MODEL] [--which_direction WHICH_DIRECTION] [--nThreads NTHREADS]
+                [--checkpoints_dir CHECKPOINTS_DIR] [--norm NORM] [--serial_batches] [--display_winsize DISPLAY_WINSIZE] [--display_id DISPLAY_ID] [--display_server DISPLAY_SERVER] [--display_port DISPLAY_PORT] [--no_dropout]
+                [--max_dataset_size MAX_DATASET_SIZE] [--resize_or_crop RESIZE_OR_CROP] [--no_flip] [--init_type INIT_TYPE] [--vit_name VIT_NAME] [--pre_trained_path PRE_TRAINED_PATH]
+                [--pre_trained_transformer PRE_TRAINED_TRANSFORMER] [--pre_trained_resnet PRE_TRAINED_RESNET] [--display_freq DISPLAY_FREQ] [--display_single_pane_ncols DISPLAY_SINGLE_PANE_NCOLS]
+                [--update_html_freq UPDATE_HTML_FREQ] [--print_freq PRINT_FREQ] [--save_latest_freq SAVE_LATEST_FREQ] [--save_epoch_freq SAVE_EPOCH_FREQ] [--continue_train] [--epoch_count EPOCH_COUNT] [--phase PHASE]
+                [--which_epoch WHICH_EPOCH] [--niter NITER] [--niter_decay NITER_DECAY] [--beta1 BETA1] [--lr LR] [--trans_lr_coef TRANS_LR_COEF] [--no_lsgan] [--lambda_A LAMBDA_A] [--lambda_B LAMBDA_B] [--lambda_f LAMBDA_F]
+                [--lambda_identity LAMBDA_IDENTITY] [--pool_size POOL_SIZE] [--no_html] [--lr_policy LR_POLICY] [--lr_decay_iters LR_DECAY_ITERS] [--lambda_vgg LAMBDA_VGG] [--vgg_layer VGG_LAYER] [--lambda_adv LAMBDA_ADV]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --dataroot DATAROOT   path to images (should have subfolders trainA, trainB, valA, valB, etc) (default: None)
+  --batchSize BATCHSIZE
+                        input batch size (default: 1)
+  --loadSize LOADSIZE   scale images to this size (default: 286)
+  --fineSize FINESIZE   then crop to this size (default: 256)
+  --input_nc INPUT_NC   # of input image channels (default: 3)
+  --output_nc OUTPUT_NC
+                        # of output image channels (default: 3)
+  --ngf NGF             # of gen filters in first conv layer (default: 64)
+  --ndf NDF             # of discrim filters in first conv layer (default: 64)
+  --which_model_netD WHICH_MODEL_NETD
+                        selects model to use for netD (default: basic)
+  --which_model_netG WHICH_MODEL_NETG
+                        selects model to use for netG (default: i2i_mamba)
+  --n_layers_D N_LAYERS_D
+                        only used if which_model_netD==n_layers (default: 3)
+  --gpu_ids GPU_IDS     gpu ids: e.g. 0 0,1,2, 0,2. use -1 for CPU (default: 0)
+  --name NAME           name of the experiment. It decides where to store samples and models (default: experiment_name)
+  --dataset_mode DATASET_MODE
+                        chooses how datasets are loaded. [unaligned | aligned | single] (default: unaligned)
+  --model MODEL         chooses which model to use. i2i_mamba_many, i2i_mamba_one, or test (default: i2i_mamba_many)
+  --which_direction WHICH_DIRECTION
+                        AtoB or BtoA (default: AtoB)
+  --nThreads NTHREADS   # threads for loading data (default: 2)
+  --checkpoints_dir CHECKPOINTS_DIR
+                        models are saved here (default: ./checkpoints)
+  --norm NORM           instance normalization or batch normalization (default: instance)
+  --serial_batches      if true, takes images in order to make batches, otherwise takes them randomly (default: False)
+  --display_winsize DISPLAY_WINSIZE
+                        display window size (default: 256)
+  --display_id DISPLAY_ID
+                        window id of the web display (default: 1)
+  --display_server DISPLAY_SERVER
+                        visdom server of the web display (default: http://localhost)
+  --display_port DISPLAY_PORT
+                        visdom port of the web display (default: 8097)
+  --no_dropout          no dropout for the generator (default: False)
+  --max_dataset_size MAX_DATASET_SIZE
+                        Maximum number of samples allowed per dataset. If the dataset directory contains more than max_dataset_size, only a subset is loaded. (default: inf)
+  --resize_or_crop RESIZE_OR_CROP
+                        scaling and cropping of images at load time [resize_and_crop|crop|scale_width|scale_width_and_crop] (default: resize_and_crop)
+  --no_flip             if specified, do not flip the images for data augmentation (default: False)
+  --init_type INIT_TYPE
+                        network initialization [normal|xavier|kaiming|orthogonal] (default: normal)
+  --vit_name VIT_NAME   vit type (default: I2IMamba-B_16)
+  --pre_trained_path PRE_TRAINED_PATH
+                        path to the pre-trained resnet architecture (default: ./checkpoints/T1_T2_PD_IXI/latest_net_G.pth)
+  --pre_trained_transformer PRE_TRAINED_TRANSFORMER
+                        Pre-trained ViT or not (default: 0)
+  --pre_trained_resnet PRE_TRAINED_RESNET
+                        Pre-trained residual CNNs or not (default: 0)
+  --display_freq DISPLAY_FREQ
+                        frequency of showing training results on screen (default: 100)
+  --display_single_pane_ncols DISPLAY_SINGLE_PANE_NCOLS
+                        if positive, display all images in a single visdom web panel with certain number of images per row. (default: 0)
+  --update_html_freq UPDATE_HTML_FREQ
+                        frequency of saving training results to html (default: 1000)
+  --print_freq PRINT_FREQ
+                        frequency of showing training results on console (default: 100)
+  --save_latest_freq SAVE_LATEST_FREQ
+                        frequency of saving the latest results (default: 5000)
+  --save_epoch_freq SAVE_EPOCH_FREQ
+                        frequency of saving checkpoints at the end of epochs (default: 5)
+  --continue_train      continue training: load the latest model (default: False)
+  --epoch_count EPOCH_COUNT
+                        the starting epoch count, we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>, ... (default: 1)
+  --phase PHASE         train, val, test, etc (default: train)
+  --which_epoch WHICH_EPOCH
+                        which epoch to load? set to latest to use latest cached model (default: latest)
+  --niter NITER         # of iter at starting learning rate (default: 100)
+  --niter_decay NITER_DECAY
+                        # of iter to linearly decay learning rate to zero (default: 100)
+  --beta1 BETA1         momentum term of adam (default: 0.5)
+  --lr LR               initial learning rate for adam (default: 0.0002)
+  --trans_lr_coef TRANS_LR_COEF
+                        initial learning rate for adam (default: 1)
+  --no_lsgan            do *not* use least square GAN, if false, use vanilla GAN (default: False)
+  --lambda_A LAMBDA_A   weight for cycle loss (A -> B -> A) (default: 10.0)
+  --lambda_B LAMBDA_B   weight for cycle loss (B -> A -> B) (default: 10.0)
+  --lambda_f LAMBDA_F   momentum term for f (default: 0.9)
+  --lambda_identity LAMBDA_IDENTITY
+                        use identity mapping. Setting lambda_identity other than 0 has an effect of scaling the weight of the identity mapping loss.For example, if the weight of the identity loss should be 10 times smaller than
+                        the weight of the reconstruction loss, please set lambda_identity = 0.1 (default: 0)
+  --pool_size POOL_SIZE
+                        the size of image buffer that stores previously generated images (default: 50)
+  --no_html             do not save intermediate training results to [opt.checkpoints_dir]/[opt.name]/web/ (default: False)
+  --lr_policy LR_POLICY
+                        learning rate policy: lambda|step|plateau (default: lambda)
+  --lr_decay_iters LR_DECAY_ITERS
+                        multiply by a gamma every lr_decay_iters iterations (default: 50)
+  --lambda_vgg LAMBDA_VGG
+                        weight for vgg loss (default: 1.0)
+  --vgg_layer VGG_LAYER
+                        layer of vgg for perc loss (default: 2)
+  --lambda_adv LAMBDA_ADV
+                        weight for adversarial loss (default: 1.0)
